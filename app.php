@@ -1,14 +1,10 @@
 <?php
 
-
-require_once ('config.php');
-
 // Connessione al database MySQL
-$host = HOST;
-$user = UTENTE;
-$password = PASSWORD;
-$dbname = DATABASE;
-
+$host = 'localhost';
+$user = 'root';
+$password = '';
+$dbname = 'learntest';
 
 $conn = mysqli_connect($host, $user, $password, $dbname);
 
@@ -16,48 +12,31 @@ $conn = mysqli_connect($host, $user, $password, $dbname);
 if (!$conn) {
     die("Connessione al database fallita: " . mysqli_connect_error());
 } else {
-  $sql = "SELECT * FROM corso";
-  $result = $conn->query($sql);
+    $sql = "SELECT * FROM corso ORDER BY chapter, sub_id";
+    $result = $conn->query($sql);
 
-  // output data of each row
-  if($result->num_rows > 0)
-  {
-    while($row = $result->fetch_assoc()) 
-    {
-      $link = '';
-      if($row['type_link'] == '0') {
-        echo '<div class="item">';
-          echo '<a class="sub-btn">Capitolo ' .$row['link_id']. '</a>';
-          echo '<div class="sub-menu">';
-      }else {
-        for($x=1; $x<=1; $x++){
-          //if($row['type_link'] == '1') {
-            for($x=0; $x<=1; $x++){
-              echo '<a href="#" id="sub-0'.$row['link_id'].'" class="sub-item">' . $row['title_link'] .'</a>';
+    if($result->num_rows > 0) {
+        $currentChapter = 0;
+        while($row = $result->fetch_assoc()) {
+            if($currentChapter != $row['chapter']) {
+                if($currentChapter != 0) {
+                    echo '</div><!-- sub-menu -->';
+                    echo '</div><!-- item -->';
+                }
+                $currentChapter = $row['chapter'];
+                echo '<div class="item">';
+                echo '<a class="sub-btn">'. $row['title_link']. ' ' . $currentChapter . '</a>';
+                echo '<div class="sub-menu">';
             }
-          //}
+            echo '<a href="#" id="sub-0'. $row['sub_id'] .'" class="sub-item">' . $row['title_link'] .'</a>';
         }
         echo '</div><!-- sub-menu -->';
         echo '</div><!-- item -->';
-      }
-        
-      
-      //echo $row['title_link'] . ": ". $link . "<br><br>";
-      //echo '<div class="item">';
-
-      
-    }//while
-   // echo '</div><!-- item -->';
-  }
-
-  exit;
+    }
 }
 
-
-
-// Chiudi la connessione
-mysqli_close($conn);
-
+$conn->close();
+exit;
 ?>
 
 <!DOCTYPE html>
